@@ -102,4 +102,22 @@ public class DishController {
         dishService.updateByIdWithFlavor(dishDto);
         return R.success("成功更新菜单");
     }
+
+    /**
+     * 虽然这里只用到 categoryId，但还是选择接收一个 Dish 对象
+     * 目前来看似乎有点浪费了，但未来如果需要根据其他字段进行查询，
+     * 我们可以直接复用该接口，而不需要新建接口，所以是好是坏见仁见智。
+     * @param dish
+     * @return
+     */
+    @GetMapping("list")
+    public R<List<Dish>> list(Dish dish) {
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<Dish>()
+                .eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId())
+                .eq(Dish::getStatus, 1) // 这一块不一定需要，但由于前端没有对停售进行处理，所以这里直接禁用了。
+                .orderByAsc(Dish::getSort)
+                .orderByDesc(Dish::getUpdateTime);
+
+        return R.success(dishService.list(queryWrapper));
+    }
 }
