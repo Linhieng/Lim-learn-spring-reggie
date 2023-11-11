@@ -1,5 +1,6 @@
 package cn.oonoo.reggie.filter;
 
+import cn.oonoo.reggie.common.BaseContext;
 import cn.oonoo.reggie.common.R;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,11 @@ public class LoginCheckFilter implements Filter {
         }
 
         // 4. 判断是否已登录
-        if (request.getSession().getAttribute("employee") != null) {
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        if (empId != null) {
+            // 将 empId 保存在当前线程的上下文中
+            BaseContext.setCurrentId(empId);
+
             filterChain.doFilter(request, response);
             return;
         }
