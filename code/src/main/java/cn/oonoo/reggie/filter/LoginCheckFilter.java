@@ -52,7 +52,7 @@ public class LoginCheckFilter implements Filter {
         }
 
         // 5.
-        response.getWriter().write(JSON.toJSONString(R.error("NOLOGIN")));
+        response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
     }
 
 
