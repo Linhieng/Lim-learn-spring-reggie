@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RequestMapping("/employee")
@@ -21,6 +22,33 @@ import javax.servlet.http.HttpServletRequest;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+
+    /**
+     * 新增员工
+     *
+     * @param request
+     * @param employee
+     * @return
+     */
+    @PostMapping
+    public R<String> save(HttpServletRequest request, @RequestBody Employee employee) {
+
+        // 数据库中存储的是加密后的密码。每新增一个员工时，给他们一个默认密码，后续可以让他们自己修改密码
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+
+        // 这一块应该可以让数据库自动完成
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        // 获取当前登录的用户 id
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        employee.setCreateUser(empId);
+        employee.setUpdateUser(empId);
+
+        employeeService.save(employee);
+
+        return R.success("成功新增一名员工");
+    }
 
 
     /**
