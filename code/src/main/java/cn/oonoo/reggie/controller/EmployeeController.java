@@ -148,4 +148,11 @@ public class EmployeeController {
         return R.success("员工信息修改成功");
 
     }
+
+
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable Long id) {
+        log.info("根据 id:{} 查询员工信息", id);
+        return R.success(employeeService.getById(id));
+    }
 }
