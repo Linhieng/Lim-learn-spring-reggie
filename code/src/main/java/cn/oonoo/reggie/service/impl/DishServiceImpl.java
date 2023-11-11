@@ -43,6 +43,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     /**
      * 根据 id 查询菜品信息和对应的口味信息
+     *
      * @param id
      * @return
      */
@@ -59,5 +60,31 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dishDto.setFlavors(dishFlavorService.list(eq));
 
         return dishDto;
+    }
+
+    /**
+     * 更新 dish 表时，我们同时需要操作 dishFlavor 表
+     * 涉及到多表时一般都会使用事务，即添加 @Transactional 注解
+     *
+     * @param dishDto
+     */
+    @Override
+    @Transactional
+    public void updateByIdWithFlavor(DishDto dishDto) {
+        this.updateById(dishDto);
+
+        Long dishId = dishDto.getId();
+
+        LambdaQueryWrapper<DishFlavor> dishFlavorQW = new LambdaQueryWrapper<DishFlavor>()
+                .eq(DishFlavor::getDishId, dishId);
+        dishFlavorService.remove(dishFlavorQW);
+
+        // 我们需要为 flavor 添加 dishId
+        List<DishFlavor> flavors = dishDto.getFlavors();
+        flavors = flavors.stream()
+                .peek(item -> item.setDishId(dishId))
+                .collect(Collectors.toList());
+
+        dishFlavorService.saveBatch(flavors);
     }
 }

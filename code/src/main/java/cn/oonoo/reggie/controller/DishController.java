@@ -10,14 +10,12 @@ import cn.oonoo.reggie.service.DishService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/dish")
 @RestController
@@ -93,5 +91,15 @@ public class DishController {
     @GetMapping("/{id}")
     public R<DishDto> getByIdWithFlavor(@PathVariable Long id) {
         return R.success(dishService.getByIdWithFlavor(id));
+    }
+
+    /**
+     * 更新 dish 和 dishFlavor
+     * @return
+     */
+    @PutMapping
+    public R<String> updateByIdWithFlavor(@RequestBody DishDto dishDto) {
+        dishService.updateByIdWithFlavor(dishDto);
+        return R.success("成功更新菜单");
     }
 }
