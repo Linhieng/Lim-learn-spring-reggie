@@ -38,4 +38,9 @@ public class GlobalExceptionHandler {
         return R.error("sql 完整性约束异常");
     }
 
+    @ExceptionHandler(CustomException.class)
+    public R<String> custonExceptionHandler(CustomException ex) {
+        return R.error(ex.getMessage());
+    }
+
 }
