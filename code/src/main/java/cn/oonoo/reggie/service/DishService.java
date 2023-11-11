@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface DishService extends IService<Dish> {
     public void saveWithFlavor(DishDto dishDto);
+
+    public DishDto getByIdWithFlavor(Long id);
 }

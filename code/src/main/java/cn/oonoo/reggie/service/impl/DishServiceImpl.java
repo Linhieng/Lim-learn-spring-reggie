@@ -6,8 +6,10 @@ import cn.oonoo.reggie.entity.DishFlavor;
 import cn.oonoo.reggie.mapper.DishMapper;
 import cn.oonoo.reggie.service.DishFlavorService;
 import cn.oonoo.reggie.service.DishService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     /**
      * 由于涉及到了两张表的操作，所以这里添加了事务操作
+     *
      * @param dishDto
      */
     @Transactional
@@ -36,10 +39,25 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
         // 保存菜品口味数据到 dish_flavor 表中
         dishFlavorService.saveBatch(flavors);
+    }
 
+    /**
+     * 根据 id 查询菜品信息和对应的口味信息
+     * @param id
+     * @return
+     */
+    @Override
+    public DishDto getByIdWithFlavor(Long id) {
+        Dish dish = this.getById(id);
 
+        DishDto dishDto = new DishDto();
+        BeanUtils.copyProperties(dish, dishDto);
 
+        LambdaQueryWrapper<DishFlavor> eq = new LambdaQueryWrapper<DishFlavor>()
+                .eq(DishFlavor::getDishId, dish.getId());
 
+        dishDto.setFlavors(dishFlavorService.list(eq));
 
+        return dishDto;
     }
 }

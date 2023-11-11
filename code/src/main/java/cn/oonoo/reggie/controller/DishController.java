@@ -10,12 +10,14 @@ import cn.oonoo.reggie.service.DishService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/dish")
 @RestController
@@ -81,5 +83,15 @@ public class DishController {
         dishDtoPage.setRecords(dishDtoRecords);
 
         return R.success(dishDtoPage);
+    }
+
+    /**
+     * 根据 id 获取 dish + dish_flavor 内容
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<DishDto> getByIdWithFlavor(@PathVariable Long id) {
+        return R.success(dishService.getByIdWithFlavor(id));
     }
 }
