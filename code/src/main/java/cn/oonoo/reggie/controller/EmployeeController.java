@@ -35,9 +35,9 @@ public class EmployeeController {
         // 数据库中存储的是加密后的密码。每新增一个员工时，给他们一个默认密码，后续可以让他们自己修改密码
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
 
-        // 这一块应该可以让数据库自动完成
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        // 这一块由 MyBatis Plus 的公共字段自动填充来实现
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
 
         // 获取当前登录的用户 id
         Long empId = (Long) request.getSession().getAttribute("employee");
@@ -140,7 +140,7 @@ public class EmployeeController {
     @PutMapping
     public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
         Long empId = (Long) request.getSession().getAttribute("employee");
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
         employee.setUpdateUser(empId);
         // 案例来说，普通员工能更新的内容是有限的，不过这里先这样吧。
         employeeService.updateById(employee);
