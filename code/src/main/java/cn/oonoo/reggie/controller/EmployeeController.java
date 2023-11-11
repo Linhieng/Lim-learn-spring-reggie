@@ -4,13 +4,12 @@ import cn.oonoo.reggie.common.R;
 import cn.oonoo.reggie.entity.Employee;
 import cn.oonoo.reggie.service.EmployeeService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -103,5 +102,30 @@ public class EmployeeController {
         // 清理 session 中保存的当前登录员工的 id
         request.getSession().removeAttribute("employee");
         return R.success("成功退出登录");
+    }
+
+    /**
+     * 分页查询员工信息
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+    @GetMapping("/page")
+    public R<Page<Employee>> page(int page, int pageSize, String name) {
+
+        // 1. 创建一个分页构造器
+        Page<Employee> employeePage = new Page<>(page, pageSize);
+
+        // 2. 创建一个条件构造器
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .like(StringUtils.isNotEmpty(name), Employee::getName, name)
+                .orderByDesc(Employee::getUpdateTime);
+
+        // 3. 根据条件进行分页
+        employeeService.page(employeePage, queryWrapper);
+
+        return R.success(employeePage);
     }
 }
