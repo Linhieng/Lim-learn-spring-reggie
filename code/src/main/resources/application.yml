@@ -18,3 +18,5 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: assign_id
+reggie:
+  upload-path: C:\Users\Linhi\Downloads\tmp\a\b\c\ # 注意末尾得是分隔符，因为代码中是直接拼接路径的
