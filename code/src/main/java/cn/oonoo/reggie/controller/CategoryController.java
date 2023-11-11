@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RequiredArgsConstructor
 @RequestMapping("/category")
@@ -42,6 +44,7 @@ public class CategoryController {
 
     /**
      * 分页获取所有菜品和套餐类别
+     *
      * @param curPage
      * @param pageSize
      * @return
@@ -64,5 +67,24 @@ public class CategoryController {
         categoryService.removeById(id);
 
         return R.success("成功删除该分类");
+    }
+
+
+    /**
+     * 根据类型（菜品或套餐）查询对应分类数据
+     *
+     * @param category
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Category>> listByType(Category category) {
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<Category>()
+                .eq(category.getType() != null, Category::getType, category.getType())
+                .orderByAsc(Category::getSort)
+                .orderByDesc(Category::getUpdateTime);
+
+        List<Category> list = categoryService.list(queryWrapper);
+
+        return R.success(list);
     }
 }
