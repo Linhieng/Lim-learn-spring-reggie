@@ -11,6 +11,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
     /**
      * 设置静态资源映射路径
+     *
      * @param registry
      */
     @Override
