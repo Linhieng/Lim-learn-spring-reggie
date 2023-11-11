@@ -106,6 +106,7 @@ public class EmployeeController {
 
     /**
      * 分页查询员工信息
+     *
      * @param page
      * @param pageSize
      * @param name
@@ -127,5 +128,24 @@ public class EmployeeController {
         employeeService.page(employeePage, queryWrapper);
 
         return R.success(employeePage);
+    }
+
+    /**
+     * 根据 id 修改员工信息。
+     *
+     * @param request
+     * @param employee
+     * @return
+     */
+    @PutMapping
+    public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(empId);
+        // 案例来说，普通员工能更新的内容是有限的，不过这里先这样吧。
+        employeeService.updateById(employee);
+
+        return R.success("员工信息修改成功");
+
     }
 }
