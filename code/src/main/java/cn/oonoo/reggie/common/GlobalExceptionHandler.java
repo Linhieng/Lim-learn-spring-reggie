@@ -25,7 +25,16 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public R<String> exceptionHandler(SQLIntegrityConstraintViolationException ex) {
-        log.error(ex.getMessage());
+        String errMessage = ex.getMessage();
+
+        // 此处直接通过 errMessage 来提取异常信息，这种做法我个人觉得不太行。
+        if (errMessage.contains("Duplicate entry")) {
+            String[] s = errMessage.split(" ");
+            return R.error(s[2] + " 已存在");
+        }
+
+        log.error(errMessage);
+
         return R.error("sql 完整性约束异常");
     }
 
