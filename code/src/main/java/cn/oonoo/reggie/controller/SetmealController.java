@@ -27,19 +27,35 @@ public class SetmealController {
 
     /**
      * 新增套餐
+     *
      * @param setmealDto
      * @return
      */
     @PostMapping
     public R<String> save(@RequestBody SetmealDto setmealDto) {
 
-        setmealService.saveWithSetmealDish(setmealDto);
+        setmealService.saveOrUpdateWithSetmealDish(setmealDto);
 
         return R.success("成功新增套餐");
     }
 
     /**
+     * 更新菜单
+     *
+     * @param setmealDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto) {
+
+        setmealService.saveOrUpdateWithSetmealDish(setmealDto);
+
+        return R.success("成功更新套餐");
+    }
+
+    /**
      * 分页查询
+     *
      * @param page
      * @param pageSize
      * @param name
@@ -84,6 +100,7 @@ public class SetmealController {
 
     /**
      * 删除套餐和对应菜品，支持多个 id
+     *
      * @param ids
      * @return
      */
@@ -92,6 +109,37 @@ public class SetmealController {
         setmealService.removeWithSetmealDish(ids);
 
         return R.success("成功删除套餐");
+    }
+
+    /**
+     * 根据 setmealId 获取 setmeal + setmealDish 内容
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<SetmealDto> getById(@PathVariable Long id) {
+        return R.success(setmealService.getByIdWithSetmealDish(id));
+    }
+
+    /**
+     * 批量更新套餐状态（停售或起售）
+     * @param status 0 表示停售，1 表示起售
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public R<String> updateStatus(@PathVariable int status, @RequestParam List<Long> ids) {
+
+        LambdaQueryWrapper<Setmeal> setmealQW = new LambdaQueryWrapper<Setmeal>()
+                .in(Setmeal::getId, ids);
+
+        Setmeal newSetmeal = new Setmeal();
+        newSetmeal.setStatus(status);
+
+        setmealService.update(newSetmeal, setmealQW);
+
+        return R.success("成功更新套餐状态");
     }
 
 }

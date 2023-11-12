@@ -10,6 +10,7 @@ import cn.oonoo.reggie.service.SetmealService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +24,15 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     private final SetmealDishService setmealDishService;
 
     /**
-     * 新增套餐，同时保存套餐与菜品的关联关系
+     * 新增或更新套餐，同时保存套餐与菜品的关联关系
      *
      * @param setmealDto
      */
     @Override
-    public void saveWithSetmealDish(SetmealDto setmealDto) {
+    public void saveOrUpdateWithSetmealDish(SetmealDto setmealDto) {
 
         // 保存 setmeal 信息
-        this.save(setmealDto);
+        this.saveOrUpdate(setmealDto);
 
         // 保存 setmealDish 信息，同样的需要自己添加 setmealid
         Long setmealId = setmealDto.getId();
@@ -39,7 +40,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         setmealDishes = setmealDishes.stream()
                 .peek(item -> item.setSetmealId(setmealId))
                 .collect(Collectors.toList());
-        setmealDishService.saveBatch(setmealDishes);
+        setmealDishService.saveOrUpdateBatch(setmealDishes);
     }
 
     /**
@@ -67,5 +68,26 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
                 .in(SetmealDish::getSetmealId, setmealIds);
         setmealDishService.remove(setmealDishQW);
 
+    }
+
+    /**
+     * 根据 setmealId 获取 setmeal + setmealDish 内容。
+     * @param setmealId
+     * @return
+     */
+    @Override
+    public SetmealDto getByIdWithSetmealDish(Long setmealId) {
+        Setmeal setmeal = this.getById(setmealId);
+
+        SetmealDto setmealDto = new SetmealDto();
+        BeanUtils.copyProperties(setmeal, setmealDto);
+
+        LambdaQueryWrapper<SetmealDish> setmealDishQW = new LambdaQueryWrapper<SetmealDish>()
+                .eq(SetmealDish::getSetmealId, setmealId);
+        List<SetmealDish> setmealDishList = setmealDishService.list(setmealDishQW);
+
+        setmealDto.setSetmealDishes(setmealDishList);
+
+        return setmealDto;
     }
 }

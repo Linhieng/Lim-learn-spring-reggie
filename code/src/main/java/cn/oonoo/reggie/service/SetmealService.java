@@ -8,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface SetmealService extends IService<Setmeal> {
-    void saveWithSetmealDish(SetmealDto setmealDto);
+    void saveOrUpdateWithSetmealDish(SetmealDto setmealDto);
 
     @Transactional
     void removeWithSetmealDish(List<Long> setmealIds);
+
+    SetmealDto getByIdWithSetmealDish(Long id);
 }
