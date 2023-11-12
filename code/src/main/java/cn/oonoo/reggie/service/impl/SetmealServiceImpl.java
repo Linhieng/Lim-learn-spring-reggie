@@ -42,6 +42,10 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         setmealDishService.saveBatch(setmealDishes);
     }
 
+    /**
+     * 删除套餐和对应菜单信息。但不能删除正在售卖的套餐
+     * @param setmealIds
+     */
     @Override
     @Transactional
     public void removeWithSetmealDish(List<Long> setmealIds) {
